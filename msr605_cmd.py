@@ -44,7 +44,9 @@ cmdList = [ 'autosave ',
             'settings',
             'type ',
             'write', 
-            'quit']
+            'quit',
+            'pan'  # Added PAN command
+]
 
 map_5bits = {   "00001": ["00", "0"],
                 "10000": ["01", "1"],
@@ -174,6 +176,15 @@ def help_menu():
     print(" set autosave <on,off>")
     print(" set bpc <777,456,...>\t not working properly (default: 888)")
     print(" set bpi <1,2,3,all> <210,75>")
+    print("="*23+"PAN GENERATION"+"="*25)
+    print(" pan random <prefix> <count> <file>")
+    print("   Generate <count> random valid PANs with the given prefix and save to <file>.")
+    print("   Example: pan random 400000 10 pans.csv")
+    print(" pan seq <prefix> <fixed4digits> <file>")
+    print("   Generate all valid PANs with the given prefix and fixed 4 digits, save to <file>.")
+    print("   Example: pan seq 400000 1234 pans.csv")
+    print("")
+    print("  (You can also use --pan random:<prefix>:<count> or --pan seq:<prefix>:<fixed4digits> as command line arguments.)")
     print("="*60)
 
 def savedata(filename, folder, data):
@@ -585,6 +596,29 @@ def execute(cmd_tokens, dev_ptr):
         msr605_drv.set_bpc(int(msr605x.bpc[0]), int(msr605x.bpc[1]), int(msr605x.bpc[2]),dev_ptr)
         msr605x.track_type = "iso"
         return True
+
+    # PAN GENERATION
+    if cmd_tokens[0] == 'pan':
+        if len(cmd_tokens) < 5 and (len(cmd_tokens) < 4 or cmd_tokens[1] != "random"):
+            print("Usage:")
+            print("  pan random <prefix> <count> <file>")
+            print("  pan seq <prefix> <fixed4digits> <file>")
+            return True
+        if cmd_tokens[1] == "random" and len(cmd_tokens) == 5:
+            prefix = cmd_tokens[2]
+            count = int(cmd_tokens[3])
+            file_path = cmd_tokens[4]
+            msr605x.generate_pan_file(file_path, prefix, count=count)
+            return True
+        elif cmd_tokens[1] == "seq" and len(cmd_tokens) == 5:
+            prefix = cmd_tokens[2]
+            fixed_digits = cmd_tokens[3]
+            file_path = cmd_tokens[4]
+            msr605x.generate_pan_file(file_path, prefix, fixed_digits=fixed_digits)
+            return True
+        else:
+            print("Invalid pan command. See 'help' for usage.")
+            return True
 
     # IF COMMAND DOES NOT EXIST
     print(" [*] that command does not exist")
