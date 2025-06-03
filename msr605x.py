@@ -65,30 +65,58 @@ def generate_sequential_pans(prefix, fixed_digits, length=16):
     if variable_digits < 0:
         print("Prefix and fixed_digits are too long for the desired PAN length.")
         return []
-    for i in range(1000 ** variable_digits):
+    for i in range(10 ** variable_digits):
         pan_body = prefix + fixed_digits + str(i).zfill(variable_digits)
-        checksum_digit = (10 - sum(int(d) if idx % 2 == 0 else sum(divmod(int(d) * 2, 10))
-                                   for idx, d in enumerate(pan_body[::-1])) % 10) % 10
+        checksum_digit = (10 - sum(sum(divmod(int(d) * 2, 10)) if idx % 2 == 0 else int(d) 
+                               for idx, d in enumerate(pan_body[::-1])) % 10) % 10
         pan = pan_body + str(checksum_digit)
         if luhn_check(pan) and len(pan) == length:
             pan_list.append(pan)
     return pan_list
 
-def generate_pan_file(file_path, prefix, fixed_digits=None, count=None):
-    """Generates PANs either randomly or sequentially and saves them to a file."""
+def generate_pan_file(file_path, prefix, fixed_digits=None, count=None, default_yy="00", default_mm="00"):
+    """
+    Generates PANs either randomly or sequentially and saves them to a file
+    in a format compatible with bulk_read saves (track1/track2/track3).
+    """
     try:
         if fixed_digits:
-            pan_list = generate_sequential_pans(prefix, fixed_digits)
+            # Assuming generate_sequential_pans is defined in the same file or imported correctly
+            pan_list = generate_sequential_pans(prefix, fixed_digits) #
+        else: # random PANs
+            # Assuming generate_custom_pan is defined in the same file or imported correctly
+            pan_list = [generate_custom_pan(prefix) for _ in range(count)] #
+        
+        with open(file_path, "w") as file: # Open in text mode, not CSV
+            for pan_number_str in pan_list:
+                # Track 1 data (typically alphanumeric, name, etc.) - kept empty here
+                track1_data = f"%?"
+                
+                # Track 2 data: Start Sentinel (;) + PAN + Field Separator (=) + Expiry (YYMM) + Service Code (SSS) + End Sentinel (?)
+                # The PAN generated is usually 16 digits.
+                # Example: ;PAN_NUMBER=YYMMSERVICE_CODE?
+                track2_data = f";{pan_number_str}={default_yy}{default_mm}?"
+                
+                # Track 3 data - kept empty here
+                track3_data = f"+?"
+                
+                file.write(f"track1:{track1_data}\n")
+                file.write(f"track2:{track2_data}\n")
+                file.write(f"track3:{track3_data}\n")
+                # You might want a separator line if writing multiple "cards" to one file,
+                # but the bulk_read save format doesn't typically have one between distinct reads.
+                # If each file represents one card's data, this is fine. If it's a list,
+                # this structure repeated is also fine.
+
+        if pan_list:
+            print(f"Generated {len(pan_list)} PAN records and saved to {file_path}")
         else:
-            pan_list = [generate_custom_pan(prefix) for _ in range(count)]
-        with open(file_path, "w", newline='') as file:
-            writer = csv.writer(file)
-            for pan in pan_list:
-                writer.writerow([pan])
-        print(f"Generated {len(pan_list)} PANs and saved to {file_path}")
+            print(f"No PANs generated. File '{file_path}' created (may be empty).")
+            
     except Exception as e:
-        logging.error(f"PAN file generation failed: {e}")
-        print("Error generating PAN file.")
+        logging.error(f"PAN file generation failed: {e}") #
+        # It's often helpful to print the exception to the console for immediate feedback
+        print(f"Error during PAN file generation: {e}")
 
 def tokenize(string):
     """to get a well formed command+args"""
@@ -138,12 +166,12 @@ def main():
         if pan_args[0] == 'random' and len(pan_args) == 3:
             prefix = pan_args[1]
             count = int(pan_args[2])
-            file_path = f"random_pans_{prefix}_{count}.csv"
+            file_path = f"random_pans_{prefix}_{count}.txt"
             generate_pan_file(file_path, prefix, count=count)
         elif pan_args[0] == 'seq' and len(pan_args) == 3:
             prefix = pan_args[1]
             fixed_digits = pan_args[2]
-            file_path = f"seq_pans_{prefix}_{fixed_digits}.csv"
+            file_path = f"seq_pans_{prefix}_{fixed_digits}.txt"
             generate_pan_file(file_path, prefix, fixed_digits=fixed_digits)
         else:
             print("Invalid --pan argument. Use random:<prefix>:<count> or seq:<prefix>:<fixed4digits>")

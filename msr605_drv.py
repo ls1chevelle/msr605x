@@ -165,7 +165,7 @@ class MSR605X:
         result = b''
         while True:
             try:
-                pkt = self.hid_endpoint.read(HID_PACKET_SIZE, timeout=int(timeout * 1000))
+                pkt = self.hid_endpoint.read(HID_PACKET_SIZE, timeout=int(timeout * 2000))
                 if not pkt:
                     if (time.time() - start_time) > timeout:
                         break

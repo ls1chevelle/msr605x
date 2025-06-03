@@ -12,6 +12,7 @@ from msr605_drv import (
     get_firmware_version, get_device_model, play_all_led_on, play_all_led_off,
     play_green_led_on, play_yellow_led_on, play_red_led_on
 )
+import msr605_drv
 import msr605x
 
 # auto-completion
@@ -179,10 +180,10 @@ def help_menu():
     print("="*23+"PAN GENERATION"+"="*25)
     print(" pan random <prefix> <count> <file>")
     print("   Generate <count> random valid PANs with the given prefix and save to <file>.")
-    print("   Example: pan random 400000 10 pans.csv")
+    print("   Example: pan random ######## 10 pans.txt")
     print(" pan seq <prefix> <fixed4digits> <file>")
     print("   Generate all valid PANs with the given prefix and fixed 4 digits, save to <file>.")
-    print("   Example: pan seq 400000 1234 pans.csv")
+    print("   Example: pan seq ######## 1234 pans.txt")
     print("")
     print("  (You can also use --pan random:<prefix>:<count> or --pan seq:<prefix>:<fixed4digits> as command line arguments.)")
     print("="*60)
@@ -537,27 +538,80 @@ def execute(cmd_tokens, dev_ptr):
 
     # BULK WRITE
     if cmd_tokens[0] == 'bulk_write':
-        print(" [*] Input your data. Enter for not writing to a track.")
-        t1 = input(" Track 1: ").strip()
-        t2 = input(" Track 2: ").strip()
-        t3 = input(" Track 3: ").strip()
-        var_msr605_drv = True
-        while var_msr605_drv:
-            print(" [*] swipe card to write")
-            if msr605x.track_type == 'iso':
-                res = msr605_drv.write_iso_tracks(t1,t2,t3,dev_ptr)
-            if msr605x.track_type == 'raw':
-                print(' [-] cannot write in raw mode yet, please: set type iso')
-                return True
-            if res:
-                print(" [+] Written.")
-            else:
-                print(" [-] Not written")
-            next_ = input(" [*] continue? [Yes/no] ")
-            if next_.lower() in ("y", "yes"):
-                var_msr605_drv = True
-            else:
-                var_msr605_drv = False
+        if len(cmd_tokens) > 1:
+            filename = cmd_tokens[1]
+        else:
+            filename = input(" Enter filename with card data to write: ").strip()
+        if not filename or not os.path.isfile(filename):
+            print(" [-] File not found, aborting bulk_write.")
+            return True
+
+        done_filename = filename + "-done.txt"
+
+        def read_next_entry(fname):
+            with open(fname, 'r') as fp:
+                lines = []
+                for _ in range(3):
+                    line = fp.readline()
+                    if not line:
+                        break
+                    lines.append(line.rstrip('\n'))
+                rest = fp.read()
+            return lines, rest
+
+        def remove_first_n_lines(fname, n):
+            with open(fname, 'r') as fp:
+                lines = fp.readlines()
+            with open(fname, 'w') as fp:
+                fp.writelines(lines[n:])
+
+        def append_to_done(fname, entry_lines):
+            with open(fname, 'a') as fp:
+                for line in entry_lines:
+                    fp.write(line + '\n')
+
+        while True:
+            entry, _ = read_next_entry(filename)
+            if len(entry) < 3:
+                print(" [+] All entries written. File is empty or done.")
+                break
+
+            t1, t2, t3 = entry
+            print(f" [*] Next card to write:\n  Track 1: {t1}\n  Track 2: {t2}\n  Track 3: {t3}")
+            print(" [*] Swipe card to write. (Ctrl+C to abort)")
+
+            # Convert to bytes
+            t1_bytes = t1.encode('ascii')
+            t2_bytes = t2.encode('ascii')
+            t3_bytes = t3.encode('ascii')
+
+            # Write loop for Track 2 retry
+            while True:
+                try:
+                    if msr605x.track_type == 'iso':
+                        res = write_iso_tracks(t1_bytes, t2_bytes, t3_bytes, dev_ptr)
+                    elif msr605x.track_type == 'raw':
+                        print(' [-] cannot write in raw mode yet, please: set type iso')
+                        return True
+                    else:
+                        print(' [-] Unknown track type.')
+                        return True
+                except KeyboardInterrupt:
+                    print("\n [*] Bulk write aborted by user.")
+                    return True
+
+                # Only retry on Track 2 error
+                if res:
+                    print(" [+] Written.")
+                    break
+                else:
+                    print(" [-] Error writing Track 2. Retrying...")
+
+            # Move the written entry to the done file
+            append_to_done(done_filename, entry)
+            remove_first_n_lines(filename, 3)
+
+        print(f" [+] All cards written successfully. Processed entries moved to {done_filename}.")
         return True
 
     # SAVE

@@ -12,29 +12,29 @@ import tkinter.font
 
 
 if __name__ == "__main__":
-  msr605x-gui = Tk()
+  msr605xgui = Tk()
 else:
-  msr605x-gui = Tk()
-msr605x-gui.title('msr605x-gui')
+  msr605xgui = Tk()
+msr605xgui.title('msr605xgui')
 dpi = 96
-msr605x-gui.geometry('400x400')
-msr605x-gui.grid_propagate(False)
+msr605xgui.geometry('400x400')
+msr605xgui.grid_propagate(False)
 for x in range(10):
-  Grid.columnconfigure(msr605x-gui, x, weight=1, uniform='row')
-  Label(msr605x-gui, width = 1, bg = '#FFFFFF').grid(row = 0, column = x, sticky = N+S+E+W)
+  Grid.columnconfigure(msr605xgui, x, weight=1, uniform='row')
+  Label(msr605xgui, width = 1, bg = '#FFFFFF').grid(row = 0, column = x, sticky = N+S+E+W)
 for y in range(10):
-  Grid.rowconfigure(msr605x-gui, y, weight=1, uniform='row')
-  Label(msr605x-gui, width = 1, bg = '#FFFFFF').grid(row = y, column = 0, sticky = N+S+E+W)
-msr605x-gui.configure(background='#FFFFFF')
-msr605x-gui.resizable(False, False)
+  Grid.rowconfigure(msr605xgui, y, weight=1, uniform='row')
+  Label(msr605xgui, width = 1, bg = '#FFFFFF').grid(row = y, column = 0, sticky = N+S+E+W)
+msr605xgui.configure(background='#FFFFFF')
+msr605xgui.resizable(False, False)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~WIDGETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-msr605x-gui.Label1 = Label(msr605x-gui, text = "Label1", font = ('Arial', 16), width = 1, height = 1, fg = '#000000', bg = '#00FFFF')
-msr605x-gui.Label1.grid(row = 1, column = 0, columnspan = 1, rowspan = 1, sticky = N+S+E+W)
-msr605x-gui.Entry1 = Entry(msr605x-gui, width = 1, bg = '#FFFFFF', font = ('Arial', 16), justify = 'center')
-msr605x-gui.Entry1.grid(row = 1, column = 1, columnspan = 3, rowspan = 1, sticky = N+S+E+W)
-msr605x-gui.Entry1.insert(0, "")
+msr605xgui.Label1 = Label(msr605xgui, text = "Label1", font = ('Arial', 16), width = 1, height = 1, fg = '#000000', bg = '#00FFFF')
+msr605xgui.Label1.grid(row = 1, column = 0, columnspan = 1, rowspan = 1, sticky = N+S+E+W)
+msr605xgui.Entry1 = Entry(msr605xgui, width = 1, bg = '#FFFFFF', font = ('Arial', 16), justify = 'center')
+msr605xgui.Entry1.grid(row = 1, column = 1, columnspan = 3, rowspan = 1, sticky = N+S+E+W)
+msr605xgui.Entry1.insert(0, "")
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~BUTTONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -45,10 +45,10 @@ def runEvent1(argument):
       Event1(argument)
     except TypeError:
       Event1()
-msr605x-gui.Button1 = Button(msr605x-gui, text = "Button1", font = ('Arial', 16), width = 1, height = 1, fg = '#000000', command = lambda: runEvent1('Button1'), bg = '#00FFFF')
-msr605x-gui.Button1.grid(row = 1, column = 5, columnspan = 1, rowspan = 1, sticky = N+S+E+W)
-msr605x-gui.Button2 = Button(msr605x-gui, text = "Button2", font = ('Arial', 16), width = 1, height = 1, fg = '#000000', command = lambda: runEvent1('Button2'), bg = '#00FFFF')
-msr605x-gui.Button2.grid(row = 2, column = 5, columnspan = 1, rowspan = 1, sticky = N+S+E+W)
+msr605xgui.Button1 = Button(msr605xgui, text = "Button1", font = ('Arial', 16), width = 1, height = 1, fg = '#000000', command = lambda: runEvent1('Button1'), bg = '#00FFFF')
+msr605xgui.Button1.grid(row = 1, column = 5, columnspan = 1, rowspan = 1, sticky = N+S+E+W)
+msr605xgui.Button2 = Button(msr605xgui, text = "Button2", font = ('Arial', 16), width = 1, height = 1, fg = '#000000', command = lambda: runEvent1('Button2'), bg = '#00FFFF')
+msr605xgui.Button2.grid(row = 2, column = 5, columnspan = 1, rowspan = 1, sticky = N+S+E+W)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~HELPER FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -56,48 +56,48 @@ def initModules():
   raise Exception('This main file is outdated. Script main.py must be updated to reflect the changes in GUI Pie v3.')
 def init():
   from main import Event1
-msr605x-gui.initModules = initModules
+msr605xgui.initModules = initModules
 def hide():
-  msr605x-gui.withdraw()
+  msr605xgui.withdraw()
 def show():
-  msr605x-gui.deiconify()
+  msr605xgui.deiconify()
 def hideAllWidgets():
-    msr605x-gui.Label1.grid_remove()
-    msr605x-gui.Entry1.grid_remove()
-    msr605x-gui.Button1.grid_remove()
-    msr605x-gui.Button2.grid_remove()
-msr605x-gui.hideAllWidgets = hideAllWidgets
+    msr605xgui.Label1.grid_remove()
+    msr605xgui.Entry1.grid_remove()
+    msr605xgui.Button1.grid_remove()
+    msr605xgui.Button2.grid_remove()
+msr605xgui.hideAllWidgets = hideAllWidgets
 def showAllWidgets():
-    msr605x-gui.Label1.grid()
-    msr605x-gui.Entry1.grid()
-    msr605x-gui.Button1.grid()
-    msr605x-gui.Button2.grid()
-msr605x-gui.showAllWidgets = showAllWidgets
+    msr605xgui.Label1.grid()
+    msr605xgui.Entry1.grid()
+    msr605xgui.Button1.grid()
+    msr605xgui.Button2.grid()
+msr605xgui.showAllWidgets = showAllWidgets
 def run():
   global dimensions
   dimensions = [0,0]
   if __name__ != "__main__":
     init()
-  msr605x-gui.mainloop()
-msr605x-gui.run = run
-msr605x-gui.hide = hide
-msr605x-gui.show = show
+  msr605xgui.mainloop()
+msr605xgui.run = run
+msr605xgui.hide = hide
+msr605xgui.show = show
 
-dimensions = [msr605x-gui.winfo_width(), msr605x-gui.winfo_height()]
+dimensions = [msr605xgui.winfo_width(), msr605xgui.winfo_height()]
 def resize():
-  global msr605x-gui, dimensions
-  if msr605x-gui.winfo_width() != dimensions[0] or msr605x-gui.winfo_height() != dimensions[1]:
-    msr605x-gui.Label1.config(wraplength = math.ceil(msr605x-gui.winfo_width() * 1 / 10) + 2)
-    msr605x-gui.Button1.config(wraplength = math.ceil(msr605x-gui.winfo_width() * 1 / 10) + 2)
-    msr605x-gui.Button2.config(wraplength = math.ceil(msr605x-gui.winfo_width() * 1 / 10) + 2)
+  global msr605xgui, dimensions
+  if msr605xgui.winfo_width() != dimensions[0] or msr605xgui.winfo_height() != dimensions[1]:
+    msr605xgui.Label1.config(wraplength = math.ceil(msr605xgui.winfo_width() * 1 / 10) + 2)
+    msr605xgui.Button1.config(wraplength = math.ceil(msr605xgui.winfo_width() * 1 / 10) + 2)
+    msr605xgui.Button2.config(wraplength = math.ceil(msr605xgui.winfo_width() * 1 / 10) + 2)
 
 eventID = None
-msr605x-gui.resizeDelay = 100
+msr605xgui.resizeDelay = 100
 def resizeEvent(event):
   global eventID
   if eventID:
-    msr605x-gui.after_cancel(eventID)
-  eventID = msr605x-gui.after(msr605x-gui.resizeDelay, resize)
-msr605x-gui.bind('<Configure>', resizeEvent)
+    msr605xgui.after_cancel(eventID)
+  eventID = msr605xgui.after(msr605xgui.resizeDelay, resize)
+msr605xgui.bind('<Configure>', resizeEvent)
 if __name__ == "__main__":
-  msr605x-gui.run()
+  msr605xgui.run()
